@@ -2,7 +2,6 @@
 
 -- | Todo List | --
 -- Track how many people we have said thanks to when using this addon thanks button
--- Show the countdown timer on the better once pressed
 
 -- Create a frame for the module
 local Module = CreateFrame("Frame")
@@ -71,10 +70,15 @@ function Module:CanSendThanks()
 	local currentTime = GetTime()
 	-- Check if the time difference between the current time and the last click time is less than 5 value
 	if currentTime - self.lastClickTime < 5 then
-		-- If the time difference is less than 5 value, return false
+		-- If the time difference is less than 5 value, update the text of the button to show the remaining time
+		self.thanksButton:SetText(string.format("Thanks (%d)", 5 - (currentTime - self.lastClickTime)))
+		-- Enable the OnUpdate script
+		self:SetScript("OnUpdate", self.UpdateThanksText)
+		-- Return false
 		return false
 	end
-	-- If the time difference is more than or equal to 5 value, return true
+
+	-- Return true
 	return true
 end
 
@@ -83,11 +87,34 @@ function Module:SetThanksCooldown()
 	self.thanksButton:Disable()
 	-- Get the current time and store it in lastClickTime
 	self.lastClickTime = GetTime()
+	-- Start updating the text of the button
+	self:SetScript("OnUpdate", self.UpdateThanksText)
 	-- Create a timer that will run after 5 value in seconds
 	C_Timer.After(5, function()
 		-- Enable the "Thanks" button after 5 set value has passed
 		self.thanksButton:Enable()
+		-- Update the text of the button to its original text
+		self.thanksButton:SetText(ThanksText)
+		-- Disable the OnUpdate script
+		self:SetScript("OnUpdate", nil)
 	end)
+end
+
+function Module:UpdateThanksText()
+	if self.lastClickTime then
+		local currentTime = GetTime()
+		local elapsedTime = currentTime - self.lastClickTime
+
+		if elapsedTime < 5 then
+			-- If the elapsed time is less than 5, update the text of the button to show the remaining time
+			self.thanksButton:SetText(string.format("Thanks (%d)", 5 - elapsedTime))
+		else
+			-- If the elapsed time is more than or equal to 5, update the text of the button to its original text
+			self.thanksButton:SetText("Thanks")
+			-- Disable the OnUpdate script
+			self:SetScript("OnUpdate", nil)
+		end
+	end
 end
 
 -- Function to handle trade show interactions
