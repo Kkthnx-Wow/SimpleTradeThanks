@@ -70,10 +70,6 @@ function Module:CanSendThanks()
 	local currentTime = GetTime()
 	-- Check if the time difference between the current time and the last click time is less than 5 value
 	if currentTime - self.lastClickTime < 5 then
-		-- If the time difference is less than 5 value, update the text of the button to show the remaining time
-		self.thanksButton:SetText(string.format("Thanks (%d)", 5 - (currentTime - self.lastClickTime)))
-		-- Enable the OnUpdate script
-		self:SetScript("OnUpdate", self.UpdateThanksText)
 		-- Return false
 		return false
 	end
@@ -101,18 +97,17 @@ function Module:SetThanksCooldown()
 end
 
 function Module:UpdateThanksText()
+	-- Check if lastClickTime is set
 	if self.lastClickTime then
+		-- Get the current time
 		local currentTime = GetTime()
+		-- Calculate the elapsed time
 		local elapsedTime = currentTime - self.lastClickTime
 
+		-- Check if the elapsed time is less than 5
 		if elapsedTime < 5 then
 			-- If the elapsed time is less than 5, update the text of the button to show the remaining time
-			self.thanksButton:SetText(string.format("Thanks (%d)", 5 - elapsedTime))
-		else
-			-- If the elapsed time is more than or equal to 5, update the text of the button to its original text
-			self.thanksButton:SetText("Thanks")
-			-- Disable the OnUpdate script
-			self:SetScript("OnUpdate", nil)
+			self.thanksButton:SetText(string.format(ThanksText .. " (%d)", 5 - elapsedTime))
 		end
 	end
 end
