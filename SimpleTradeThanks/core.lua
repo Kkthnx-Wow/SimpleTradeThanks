@@ -11,6 +11,16 @@ local Module = CreateFrame("Frame")
 Module:RegisterEvent("PLAYER_LOGIN")
 Module:RegisterEvent("VARIABLES_LOADED")
 
+-- Expansions
+local Expansion = {
+	[WOW_PROJECT_MAINLINE] = "Retail",
+	[WOW_PROJECT_CLASSIC] = "Classic",
+	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "TBC",
+	[WOW_PROJECT_WRATH_CLASSIC] = "Wrath",
+}
+
+local currentExpansion = Expansion[WOW_PROJECT_ID]
+
 -- Function to create the "Thanks" button
 function Module:CreateThanksButton()
 	-- Create a button frame
@@ -102,6 +112,9 @@ function Module:UpdateThanksButton()
 end
 
 function Module:CreateSimpleTradeThankOptions()
+	-- Determine which options panel to use
+	local optionsPanel = currentExpansion == "Retail" and SettingsPanel.Container or InterfaceOptionsFramePanelContainer
+
 	-- Define the default saved variable values
 	local SimpleTradeThanksDefaults = {
 		-- Boolean indicating if the trade thanks feature is enabled
@@ -124,7 +137,7 @@ function Module:CreateSimpleTradeThankOptions()
 	-- Create the scroll child frame and set its width to fit within the panel
 	local scrollChild = CreateFrame("Frame")
 	scrollFrame:SetScrollChild(scrollChild)
-	scrollChild:SetWidth(SettingsPanel.Container:GetWidth() - 18)
+	scrollChild:SetWidth(optionsPanel:GetWidth() - 18)
 
 	-- Set a minimum height for the scroll child frame
 	scrollChild:SetHeight(1)
