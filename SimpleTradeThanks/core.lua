@@ -7,10 +7,9 @@
 
 -- Create a frame for the module
 local Module = CreateFrame("Frame")
-
--- Register events for the frame: PLAYER_LOGIN and ADDON_LOADED
+-- Register the events for the module
 Module:RegisterEvent("PLAYER_LOGIN")
-Module:RegisterEvent("ADDON_LOADED")
+Module:RegisterEvent("VARIABLES_LOADED")
 
 -- Function to create the "Thanks" button
 function Module:CreateThanksButton()
@@ -31,7 +30,7 @@ function Module:CreateThanksButton()
 		-- Check if the target name is set and if the player is able to send a "Thanks" message
 		if self.targetName and self:CanSendThanks() then
 			-- Use the DoEmote function to perform the "THANK" emote towards the target
-			DoEmote("THANK", self.targetName)
+			DoEmote(EMOTE98_TOKEN, self.targetName)
 
 			-- Set the cooldown for the "Thanks" button
 			self:SetThanksCooldown()
@@ -63,62 +62,134 @@ function Module:SetThanksCooldown()
 	end)
 end
 
-function Module:InitializeOptions()
-	if not SimpleTradeThanksDB then
-		SimpleTradeThanksDB = {}
+-- Function to handle trade show interactions
+function Module:GetUnitPlayerName()
+	-- Get the name of the target NPC
+	local targetName = GetUnitName("NPC", true)
+
+	-- Check if the thanks button exists
+	if self.thanksButton then
+		-- Set the targetName variable to the name of the target NPC
+		self.targetName = targetName
 	end
-	SimpleTradeThanksDB.enabled = SimpleTradeThanksDB.enabled or false
+end
+
+-- Function to update the thanks button
+function Module:UpdateThanksButton()
+	-- Check if the trade thanks feature is enabled
+	if SimpleTradeThanksDB.enabled then
+		-- Check if the thanks button exists
+		if self.thanksButton then
+			-- Show the thanks button
+			self.thanksButton:Show()
+		else
+			-- Call the setup function for the thanks button
+			self:CreateThanksButton()
+		end
+
+		-- Register the "TRADE_SHOW" event
+		Module:RegisterEvent("TRADE_SHOW")
+	else
+		-- Check if the thanks button exists
+		if self.thanksButton then
+			-- Hide the thanks button
+			self.thanksButton:Hide()
+		end
+
+		-- Unregister the "TRADE_SHOW" event
+		Module:UnregisterEvent("TRADE_SHOW")
+	end
+end
+
+function Module:CreateSimpleTradeThankOptions()
+	-- Define the default saved variable values
+	local SimpleTradeThanksDefaults = {
+		-- Boolean indicating if the trade thanks feature is enabled
+		enabled = false,
+	}
+
+	-- Create the saved variable or use the existing one
+	SimpleTradeThanksDB = SimpleTradeThanksDB or CopyTable(SimpleTradeThanksDefaults)
 
 	-- Create the config panel frame
-	local ConfigPanel = CreateFrame("Frame")
+	self.ConfigPanel = CreateFrame("Frame")
 	-- Set the name of the config panel to be displayed in the Interface Options
-	ConfigPanel.name = "|cff669DFFSimpleTradeThanks|r"
+	self.ConfigPanel.name = "|cff669DFFSimpleTradeThanks|r"
+
+	-- Create the scroll frame and position it within the panel
+	local scrollFrame = CreateFrame("ScrollFrame", nil, self.ConfigPanel, "UIPanelScrollFrameTemplate")
+	scrollFrame:SetPoint("TOPLEFT", 3, -4)
+	scrollFrame:SetPoint("BOTTOMRIGHT", -27, 4)
+
+	-- Create the scroll child frame and set its width to fit within the panel
+	local scrollChild = CreateFrame("Frame")
+	scrollFrame:SetScrollChild(scrollChild)
+	scrollChild:SetWidth(SettingsPanel.Container:GetWidth() - 18)
+
+	-- Set a minimum height for the scroll child frame
+	scrollChild:SetHeight(1)
+
+	-- Add widgets to the scrolling child frame as desired
+	local title = scrollChild:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+	title:SetPoint("TOP")
+	title:SetText(self.ConfigPanel.name)
+
+	local footer = scrollChild:CreateFontString("ARTWORK", nil, "GameFontNormal")
+	footer:SetPoint("TOP", 0, -26)
+	footer:SetText("SimpleTradeThanks is a World of Warcraft addon that|nallows players to send a thank you message to their trade partners.|nMore features coming soon!")
 
 	-- Create the Enable/Disable checkbox for the Thanks Module
-	local EnableCheckbox = CreateFrame("CheckButton", nil, ConfigPanel, "InterfaceOptionsCheckButtonTemplate")
+	local EnableCheckbox = CreateFrame("CheckButton", nil, scrollChild, "InterfaceOptionsCheckButtonTemplate")
 	-- Set the position of the checkbox on the config panel
-	EnableCheckbox:SetPoint("TOPLEFT", 20, -20)
+	EnableCheckbox:SetPoint("TOPLEFT", 0, -80)
 	-- Set the text of the checkbox
 	EnableCheckbox.Text:SetText("Enable and add a thanks button to the trade frame")
 	-- Add an OnClick event to the checkbox
 	EnableCheckbox:SetScript("OnClick", function()
 		-- Save the state of the checkbox to the saved variable SimpleTradeThanksDB
 		SimpleTradeThanksDB.enabled = EnableCheckbox:GetChecked()
-		-- If the checkbox is checked (enabled), then show the button
+
+		-- If the checkbox is checked (enabled), then show the button and register TRADE_SHOW event
 		if SimpleTradeThanksDB.enabled then
-			Module.thanksButton:Show()
-			-- print("SimpleTradeThanks enabled")
-			-- If the checkbox is not checked (disabled), then hide the button
+			Module:UpdateThanksButton()
+			-- If the checkbox is not checked (disabled), then hide the button and unregister TRADE_SHOW event
 		else
-			Module.thanksButton:Hide()
-			-- print("SimpleTradeThanks disabled")
+			Module:UpdateThanksButton()
 		end
 	end)
+	EnableCheckbox:SetChecked(SimpleTradeThanksDB.enabled)
 
 	-- Add the config panel to the Interface Options
-	InterfaceOptions_AddCategory(ConfigPanel)
+	InterfaceOptions_AddCategory(self.ConfigPanel)
 end
 
-function Module:OnEvent(event, addon)
-	-- Check if the event that triggered the function is TRADE_SHOW
-	if event == "TRADE_SHOW" then
-		-- Set the targetName variable to the name of the target NPC
-		self.targetName = UnitName("NPC")
-	-- Check if the event that triggered the function is PLAYER_LOGIN
-	elseif event == "PLAYER_LOGIN" then
+-- Function to handle events
+Module:SetScript("OnEvent", function(self, event)
+	-- Check if the event is "PLAYER_LOGIN"
+	if event == "PLAYER_LOGIN" then
+		-- Set the last click time to 0
 		self.lastClickTime = 0
-		-- Create the "Thanks" button
-		self:CreateThanksButton()
-		-- Register the TRADE_SHOW event to trigger the OnEvent function
 		if SimpleTradeThanksDB.enabled then
-			self:RegisterEvent("TRADE_SHOW", self.OnEvent)
+			-- Call the function to create the thanks button
+			self:CreateThanksButton()
+			-- Register the "TRADE_SHOW" event
+			Module:RegisterEvent("TRADE_SHOW")
 		end
-	-- Check if the event that triggered the function is ADDON_LOADED and the addon that loaded is SimpleTradeThanks
-	elseif event == "ADDON_LOADED" and addon == "SimpleTradeThanks" then
-		-- Initialize the options for the addon
-		self:InitializeOptions()
+	-- Check if the event is "VARIABLES_LOADED"
+	elseif event == "VARIABLES_LOADED" then
+		-- Call the functions to create the options panel and unregister the event
+		self:CreateSimpleTradeThankOptions()
+		self:UnregisterEvent(event)
+	elseif event == "TRADE_SHOW" then
+		-- Call the functions to create the options panel and unregister the event
+		self:GetUnitPlayerName()
 	end
-end
+end)
 
--- Set the OnEvent script for the Module frame to trigger the OnEvent function when an event is fired
-Module:SetScript("OnEvent", Module.OnEvent)
+-- Define the slash commands for opening the options panel
+SLASH_SIMPLETRADETHANKS1 = "/stt"
+SLASH_SIMPLETRADETHANKS2 = "/simpletradethanks"
+SlashCmdList.SIMPLETRADETHANKS = function()
+	-- Open the options panel to the "Module.ConfigPanel" category
+	InterfaceOptionsFrame_OpenToCategory(Module.ConfigPanel)
+end
