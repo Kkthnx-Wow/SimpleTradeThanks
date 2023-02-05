@@ -2,8 +2,7 @@
 
 -- | Todo List | --
 -- Track how many people we have said thanks to when using this addon thanks button
--- Let the user define the wait time before they can spam the button again? Idk 5 seems more than enough
--- Write a description in the addons settings category explaining the addon
+-- Show the countdown timer on the better once pressed
 
 -- Create a frame for the module
 local Module = CreateFrame("Frame")
@@ -12,15 +11,33 @@ Module:RegisterEvent("PLAYER_LOGIN")
 Module:RegisterEvent("VARIABLES_LOADED")
 
 -- Map WOW_PROJECT_ID values to expansion names
-local Expansion = {
+local ExpansionTable = {
 	[WOW_PROJECT_MAINLINE] = "Retail",
 	[WOW_PROJECT_CLASSIC] = "Classic", -- Not used?
 	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "TBC", -- Is TBC still a thing?
 	[WOW_PROJECT_WRATH_CLASSIC] = "Wrath",
 }
 
+-- Create a lookup table to store the translations
+local LocaleTable = {
+	["deDE"] = "Danke",
+	["esES"] = "Gracias",
+	["esMX"] = "Gracias",
+	["frFR"] = "Merci",
+	["itIT"] = "Grazie",
+	["koKR"] = "감사합니다",
+	["ptBR"] = "Obrigado",
+	["ruRU"] = "Спасибо",
+	["zhCN"] = "谢谢",
+	["zhTW"] = "謝謝",
+}
+
+-- Retrieve the current locale and store the translation in `ThanksText`
+-- If the locale is not found in the `locale_table`, the default value of "Thanks" is used
+local ThanksText = LocaleTable[GetLocale()] or "Thanks"
+
 -- Determine the current expansion based on WOW_PROJECT_ID
-local currentExpansion = Expansion[WOW_PROJECT_ID]
+local CurrentExpansion = ExpansionTable[WOW_PROJECT_ID]
 
 -- Function to create the "Thanks" button
 function Module:CreateThanksButton()
@@ -31,7 +48,7 @@ function Module:CreateThanksButton()
 	self.thanksButton:SetSize(80, 20)
 
 	-- Set the button text to "Thanks"
-	self.thanksButton:SetText("Thanks")
+	self.thanksButton:SetText(ThanksText)
 
 	-- Set the button position to bottom left of the TradeFrame, 4 pixels from the left and 6 pixels from the bottom
 	self.thanksButton:SetPoint("BOTTOMLEFT", TradeFrame, "BOTTOMLEFT", 4, 6)
@@ -114,7 +131,7 @@ end
 
 function Module:CreateSimpleTradeThankOptions()
 	-- Determine which options panel to use
-	local optionsPanel = currentExpansion == "Retail" and SettingsPanel.Container or InterfaceOptionsFramePanelContainer
+	local optionsPanel = CurrentExpansion == "Retail" and SettingsPanel.Container or InterfaceOptionsFramePanelContainer
 
 	-- Define the default saved variable values
 	local SimpleTradeThanksDefaults = {
