@@ -11,14 +11,15 @@ local Module = CreateFrame("Frame")
 Module:RegisterEvent("PLAYER_LOGIN")
 Module:RegisterEvent("VARIABLES_LOADED")
 
--- Expansions
+-- Map WOW_PROJECT_ID values to expansion names
 local Expansion = {
 	[WOW_PROJECT_MAINLINE] = "Retail",
-	[WOW_PROJECT_CLASSIC] = "Classic",
-	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "TBC",
+	[WOW_PROJECT_CLASSIC] = "Classic", -- Not used?
+	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "TBC", -- Is TBC still a thing?
 	[WOW_PROJECT_WRATH_CLASSIC] = "Wrath",
 }
 
+-- Determine the current expansion based on WOW_PROJECT_ID
 local currentExpansion = Expansion[WOW_PROJECT_ID]
 
 -- Function to create the "Thanks" button
