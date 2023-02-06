@@ -19,21 +19,36 @@ local ExpansionTable = {
 
 -- Create a lookup table to store the translations
 local LocaleTable = {
-	["deDE"] = "Danke",
-	["esES"] = "Gracias",
-	["esMX"] = "Gracias",
-	["frFR"] = "Merci",
-	["itIT"] = "Grazie",
-	["koKR"] = "감사합니다",
-	["ptBR"] = "Obrigado",
-	["ruRU"] = "Спасибо",
-	["zhCN"] = "谢谢",
-	["zhTW"] = "謝謝",
+	-- Translations for the button text
+	["Thanks_deDE"] = "Danke",
+	["Thanks_esES"] = "Gracias",
+	["Thanks_esMX"] = "Gracias",
+	["Thanks_frFR"] = "Merci",
+	["Thanks_itIT"] = "Grazie",
+	["Thanks_koKR"] = "감사합니다",
+	["Thanks_ptBR"] = "Obrigado",
+	["Thanks_ruRU"] = "Спасибо",
+	["Thanks_zhCN"] = "谢谢",
+	["Thanks_zhTW"] = "謝謝",
+	-- Translations for the desc of the addon
+	["SimpleTradeThanks_deDE"] = "SimpleTradeThanks ist ein World of Warcraft-Addon,|ndas Spielern ermöglicht, ihren Handelspartnern eine Dankesbotschaft zu senden.",
+	["SimpleTradeThanks_esES"] = "SimpleTradeThanks es un complemento de World of Warcraft|nque permite a los jugadores enviar un mensaje de agradecimiento a sus compañeros de comercio.",
+	["SimpleTradeThanks_esMX"] = "SimpleTradeThanks es un complemento de World of Warcraft|nque permite a los jugadores enviar un mensaje de agradecimiento a sus compañeros de comercio.",
+	["SimpleTradeThanks_frFR"] = "SimpleTradeThanks est un complément de World of Warcraft|npermettant aux joueurs d'envoyer un message de remerciement à leurs partenaires de commerce.",
+	["SimpleTradeThanks_itIT"] = "SimpleTradeThanks è un addon di World of Warcraft|nche consente ai giocatori di inviare un messaggio di ringraziamento ai loro partner commerciali.",
+	["SimpleTradeThanks_koKR"] = "SimpleTradeThanks는 World of Warcraft의 애드온입니다.|n거래 상대에게 감사 메시지를 보낼 수 있습니다.",
+	["SimpleTradeThanks_ptBR"] = "SimpleTradeThanks é um complemento do World of Warcraft|nque permite que os jogadores enviam uma mensagem de agradecimento aos seus parceiros comerciais.",
+	["SimpleTradeThanks_ruRU"] = "SimpleTradeThanks - это дополнение для World of Warcraft,|nпозволяющее игрокам отправлять сообщение с благодарностью своим торговым партнерам.",
+	["SimpleTradeThanks_zhCN"] = "SimpleTradeThanks是一款魔兽世界的插件，|n允许玩家向他们的交易伙伴发送感谢信息。",
+	["SimpleTradeThanks_zhTW"] = "SimpleTradeThanks是一個魔獸世界的插件，|n允許玩家向他們的交易夥伴發送感謝信息。",
 }
 
 -- Retrieve the current locale and store the translation in `ThanksText`
 -- If the locale is not found in the `locale_table`, the default value of "Thanks" is used
-local ThanksText = LocaleTable[GetLocale()] or "Thanks"
+local ThanksText = LocaleTable["Thanks_" .. GetLocale()] or "Thanks"
+
+-- Retrieve the translation for the `SimpleTradeThanks` text, using the current locale
+local SimpleTradeThanksText = LocaleTable["SimpleTradeThanks_" .. GetLocale()] or "SimpleTradeThanks is a World of Warcraft addon|nthat allows players to send a thank you message to their trade partners."
 
 -- Determine the current expansion based on WOW_PROJECT_ID
 local CurrentExpansion = ExpansionTable[WOW_PROJECT_ID]
@@ -171,8 +186,8 @@ function Module:CreateSimpleTradeThankOptions()
 
 	-- Create the scroll frame and position it within the panel
 	local scrollFrame = CreateFrame("ScrollFrame", nil, self.ConfigPanel, "UIPanelScrollFrameTemplate")
-	scrollFrame:SetPoint("TOPLEFT", 3, -4)
-	scrollFrame:SetPoint("BOTTOMRIGHT", -27, 4)
+	scrollFrame:SetPoint("TOPLEFT", 3, -6)
+	scrollFrame:SetPoint("BOTTOMRIGHT", -27, 6)
 
 	-- Create the scroll child frame and set its width to fit within the panel
 	local scrollChild = CreateFrame("Frame")
@@ -187,9 +202,9 @@ function Module:CreateSimpleTradeThankOptions()
 	title:SetPoint("TOP")
 	title:SetText(self.ConfigPanel.name)
 
-	local footer = scrollChild:CreateFontString("ARTWORK", nil, "GameFontNormal")
-	footer:SetPoint("TOP", 0, -26)
-	footer:SetText("SimpleTradeThanks is a World of Warcraft addon that|nallows players to send a thank you message to their trade partners.|nMore features coming soon!")
+	local description = scrollChild:CreateFontString("ARTWORK", nil, "GameFontNormal")
+	description:SetPoint("TOP", 0, -26)
+	description:SetText(SimpleTradeThanksText)
 
 	-- Create the Enable/Disable checkbox for the Thanks Module
 	local EnableCheckbox = CreateFrame("CheckButton", nil, scrollChild, "InterfaceOptionsCheckButtonTemplate")
