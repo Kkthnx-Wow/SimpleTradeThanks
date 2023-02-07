@@ -9,14 +9,6 @@ local Module = CreateFrame("Frame")
 Module:RegisterEvent("PLAYER_LOGIN")
 Module:RegisterEvent("VARIABLES_LOADED")
 
--- Map WOW_PROJECT_ID values to expansion names
-local ExpansionTable = {
-	[WOW_PROJECT_MAINLINE] = "Retail",
-	[WOW_PROJECT_CLASSIC] = "Classic", -- Not used?
-	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "TBC", -- Is TBC still a thing?
-	[WOW_PROJECT_WRATH_CLASSIC] = "Wrath",
-}
-
 -- Create a lookup table to store the translations
 local LocaleTable = {
 	-- Translations for the button text
@@ -49,9 +41,6 @@ local ThanksText = LocaleTable["Thanks_" .. GetLocale()] or "Thanks"
 
 -- Retrieve the translation for the `SimpleTradeThanks` text, using the current locale
 local SimpleTradeThanksText = LocaleTable["SimpleTradeThanks_" .. GetLocale()] or "SimpleTradeThanks is a World of Warcraft addon|nthat allows players to send a thank you message to their trade partners."
-
--- Determine the current expansion based on WOW_PROJECT_ID
-local CurrentExpansion = ExpansionTable[WOW_PROJECT_ID]
 
 -- Function to create the "Thanks" button
 function Module:CreateThanksButton()
@@ -168,7 +157,7 @@ end
 
 function Module:CreateSimpleTradeThankOptions()
 	-- Determine which options panel to use
-	local optionsPanel = CurrentExpansion == "Retail" and SettingsPanel.Container or InterfaceOptionsFramePanelContainer
+	local optionsPanel = WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE and SettingsPanel.Container or InterfaceOptionsFramePanelContainer
 
 	-- Define the default saved variable values
 	local SimpleTradeThanksDefaults = {
@@ -247,7 +236,7 @@ Module:SetScript("OnEvent", function(self, event)
 	elseif event == "VARIABLES_LOADED" then
 		-- Call the functions to create the options panel and unregister the event
 		self:CreateSimpleTradeThankOptions()
-		self:UnregisterEvent(event)
+		-- self:UnregisterEvent(event)
 	elseif event == "TRADE_SHOW" then
 		-- Call the functions to create the options panel and unregister the event
 		self:GetUnitPlayerName()
