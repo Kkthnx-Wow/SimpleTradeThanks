@@ -1,5 +1,7 @@
 # SimpleTradeThanks
 
+![simpletradethanks](https://user-images.githubusercontent.com/40672673/217148336-3640b7eb-8603-49f0-bcaa-c3930756ebf6.png)
+
 /stt in chat for enabling and disabling addon
 
 ## Join the community
@@ -13,5 +15,3 @@ Donations are welcome, but not required to use the UI at all. Donations help me 
 
 * [PayPal](https://www.paypal.me/kkthnx)
 * [Patreon](https://www.patreon.com/kkthnx)
-
- 
