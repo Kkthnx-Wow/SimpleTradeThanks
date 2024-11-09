@@ -28,7 +28,7 @@ local LocaleTable = {
 }
 
 local ThanksText = LocaleTable["Thanks_" .. GetLocale()] or "Thanks"
-local SimpleTradeThanksText = LocaleTable["SimpleTradeThanks_" .. GetLocale()] or "SimpleTradeThanks is a World of Warcraft addon|nthat allows players to send a thank you message to their trade partners."
+-- local SimpleTradeThanksText = LocaleTable["SimpleTradeThanks_" .. GetLocale()] or "SimpleTradeThanks is a World of Warcraft addon|nthat allows players to send a thank you message to their trade partners."
 
 function Module:CreateThanksButton()
 	self.thanksButton = CreateFrame("Button", nil, TradeFrame, "UIPanelButtonTemplate")
@@ -84,14 +84,12 @@ function Module:UpdateThanksButton()
 		if self.thanksButton then
 			self.thanksButton:Show()
 		else
-			--self:CreateThanksButton()
+			self:CreateThanksButton()
 		end
-		Module:RegisterEvent("TRADE_SHOW")
 	else
 		if self.thanksButton then
 			self.thanksButton:Hide()
 		end
-		--Module:UnregisterEvent("TRADE_SHOW")
 	end
 end
 
@@ -99,13 +97,9 @@ function Module:PLAYER_LOGIN()
 	self.lastClickTime = 0
 	if Module:GetOption("Enable") then
 		self:CreateThanksButton()
-		Module:RegisterEvent("TRADE_SHOW")
+		Module:TRADE_SHOW()
 	end
 end
-
--- function Module:ADDON_LOADED()
--- 	self:CreateSimpleTradeThankOptions()
--- end
 
 function Module:TRADE_SHOW()
 	self:GetUnitPlayerName()
