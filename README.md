@@ -1,4 +1,4 @@
-# SimpleTradeThanks
+# TradeThanks
 
 ![simpletradethanks](https://user-images.githubusercontent.com/40672673/217148336-3640b7eb-8603-49f0-bcaa-c3930756ebf6.png)
 
