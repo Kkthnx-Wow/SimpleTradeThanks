@@ -1,6 +1,8 @@
 # TradeThanks
 
 ![simpletradethanks](https://user-images.githubusercontent.com/40672673/217148336-3640b7eb-8603-49f0-bcaa-c3930756ebf6.png)
+![{9076337C-5A18-42E8-89BE-CF6E64388AD7}](https://github.com/user-attachments/assets/f41c4939-8803-4a13-932a-282451fbb550)
+
 
 /stt in chat for enabling and disabling addon
 
